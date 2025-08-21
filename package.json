@@ -21,9 +21,11 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.9.0",
     "faker": "^6.6.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "scheduler": "^0.26.0",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.5"
   }
