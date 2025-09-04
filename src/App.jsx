@@ -1,32 +1,31 @@
 // src/App.jsx
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
-import HomePage from "./pages/HomePage";
-import NewPostPage from "./pages/NewPostPage";
-import { ROUTES } from "./config/routes"; // HOME & NEW_POST
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import HeaderBar from "./components/HeaderBar.jsx";
+import SiteFooter from "./components/SiteFooter.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import NewPostPage from "./pages/NewPostPage.jsx";
+import PlansPage from "./pages/PlansPage.jsx";
+import RequireAuth from "./routes/RequireAuth.jsx";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <HeaderBar />
       <Routes>
-        {/* Home */}
-        <Route path={ROUTES.HOME} element={<HomePage />} />
-
-        {/* New Post (modal on top of the homepage) */}
+        <Route path="/" element={<HomePage />} />
         <Route
-          path={ROUTES.NEW_POST}
+          path="/post/new"
           element={
-            <>
-              <HomePage />
+            <RequireAuth>
               <NewPostPage />
-            </>
+            </RequireAuth>
           }
         />
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        <Route path="/plans" element={<PlansPage />} />
+        {/* fallback */}
+        <Route path="*" element={<HomePage />} />
       </Routes>
+      <SiteFooter />
     </BrowserRouter>
   );
 }

@@ -1,0 +1,59 @@
+:root {
+    /* Colors (Apple-inspired) */
+    --bg: #f5f5f7;
+    --text: #313131;
+    --chrome: #e9f2f8;
+    --primary: #0171e3;
+    --muted: #d9d9d9;
+
+    /* Radius & shadows */
+    --radius: 14px;
+    --shadow: 0 8px 24px rgba(0, 0, 0, .08);
+
+    /* Typography */
+    --font-family: 'Poppins', system-ui, -apple-system, Arial, sans-serif;
+    --weight-nav: 600;
+    /* Semibold */
+    --weight-heading: 500;
+    /* Medium   */
+    --weight-body: 400;
+    /* Regular  */
+}
+
+/* App-wide resets that use tokens (not hardcoded) */
+html,
+body,
+#root {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+/* Utility classes we’ll reuse */
+.btn-primary {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow);
+}
+
+.card {
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background: #fff;
+}
+
+.surface {
+    background: var(--chrome);
+}
+
+/* Modal look (rounded + soft) */
+.ui.modal {
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow) !important;
+}
