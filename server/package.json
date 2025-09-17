@@ -1,0 +1,16 @@
+{
+    "name": "newsletter-server",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "node index.js"
+    },
+    "dependencies": {
+        "@sendgrid/client": "^8.1.5",
+        "@sendgrid/mail": "^8.1.4",
+        "cors": "^2.8.5",
+        "dotenv": "^16.6.1",
+        "express": "^4.21.2",
+        "express-rate-limit": "^7.5.1"
+    }
+}

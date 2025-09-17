@@ -1,0 +1,181 @@
+/* src/styles/auth.css */
+
+/* ---------- layout ---------- */
+.auth-modal .ui.modal {
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.auth-split {
+    display: grid;
+    grid-template-columns: 42% 58%;
+    gap: 24px;
+}
+
+.auth-art {
+    min-height: 420px;
+    border-radius: calc(var(--radius) + 6px);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    box-shadow: var(--shadow);
+    animation: authArtIn .40s ease both;
+}
+
+.auth-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, .25), rgba(0, 0, 0, .45));
+    border-radius: inherit;
+}
+
+.auth-art-caption {
+    position: absolute;
+    left: 24px;
+    bottom: 20px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: .2px;
+}
+
+/* keep fields away from the right edge */
+.auth-form {
+    padding: 2px 28px 8px 8px;
+    /* top right bottom left */
+    animation: authFormIn .40s ease .05s both;
+}
+
+.auth-title {
+    margin: 0 0 4px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.auth-subtitle {
+    margin: 0 0 16px;
+    opacity: .75;
+}
+
+/* extra breathing room on the modal’s right side */
+.auth-modal .ui.modal>.content {
+    padding-right: 32px;
+}
+
+/* ---------- shared button shapes ---------- */
+.auth-modal .ui.button.btn-primary,
+.profile-modal .ui.button.btn-primary {
+    background: var(--accent) !important;
+    color: #fff !important;
+    border-radius: 9999px !important;
+    padding: 12px 20px !important;
+    font-weight: 600 !important;
+    border: 1px solid transparent !important;
+}
+
+.auth-modal .ui.button.btn-secondary,
+.profile-modal .ui.button.btn-secondary {
+    background: #fff !important;
+    color: var(--text) !important;
+    border: 1px solid var(--soft) !important;
+    border-radius: 9999px !important;
+    padding: 12px 20px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .02) !important;
+}
+
+/* ---------- small toast on success ---------- */
+.auth-toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: #111;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(-6px);
+    animation: toastIn .25s ease forwards;
+    z-index: 10000;
+    font-weight: 500;
+}
+
+@keyframes toastIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- entrance animations ---------- */
+@keyframes authArtIn {
+    from {
+        opacity: 0;
+        transform: translateX(-12px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes authFormIn {
+    from {
+        opacity: 0;
+        transform: translateX(12px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ---------- sign-up avatar preview ---------- */
+.signup-avatar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 12px;
+}
+
+.signup-avatar .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--shadow);
+    border: 2px solid #fff;
+}
+
+/* ---------- media ---------- */
+@media (max-width: 900px) {
+    .auth-split {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-art {
+        min-height: 220px;
+    }
+
+    .auth-modal .ui.modal>.content {
+        padding: 16px;
+    }
+
+    .auth-form {
+        padding: 0 10px 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .auth-art,
+    .auth-form,
+    .auth-toast {
+        animation: none !important;
+    }
+}

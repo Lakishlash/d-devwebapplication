@@ -1,0 +1,115 @@
+:root {
+    --bg: #f5f5f7;
+    /* site background */
+    --text: #313131;
+    /* base text */
+    --accent: #0171e3;
+    /* buttons/links */
+    --soft: #e9f2f8;
+    /* navbar/footer specials */
+    --radius: 12px;
+    /* rounded corners */
+    --shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    /* subtle shadow */
+    --font: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    /* button radius */
+    --btn-radius: 14px;
+    /* 50vh */
+    --hero-h: 50vh;
+    /* navbar top/bottom padding */
+    --nav-vpad: 6px;
+    /* navbar top/bottom padding */
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font-family: var(--font);
+}
+
+/* Full bleed helper: makes child span the full viewport width */
+.hero-bleed {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: 0; 
+}
+
+.hero-bleed img {
+    width: 100%;
+    height: var(--hero-h);
+    object-fit: cover;
+    border-radius: 0;
+    box-shadow: none;
+    display: block;
+}
+
+/* smaller on phones */
+@media (max-width:768px) {
+    :root {
+        --hero-h: 32vh;
+    }
+}
+
+/* Modal polish */
+.newpost-modal.ui.modal {
+    border-radius: var(--btn-radius);
+}
+
+.newpost-modal .content {
+    padding: 24px !important;
+}
+
+.newpost-modal .actions {
+    padding: 12px 16px !important;
+}
+
+:root {
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, .15);
+}
+
+/* Responsive grid for FeaturedSection right rail */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+    /* top align */
+}
+
+/* Remove default SUI card margin inside the grid and stretch to cell */
+.feature-grid .ui.card {
+    margin: 0 !important;
+    height: 100%;
+}
+
+/* 3 → 2 → 1 columns */
+@media (max-width: 1024px) {
+    .feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
