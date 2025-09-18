@@ -1,0 +1,120 @@
+.
+├── .env
+├── .gitignore
+├── eslint.config.js
+├── index.html
+├── jsconfig.json
+├── package-lock.json
+├── package.json
+├── project-tree-20250917-2326.txt
+├── public
+│   ├── assets
+│   │   ├── articleshomeimage.jpg
+│   │   ├── auth-login.jpg
+│   │   ├── auth-signup.jpg
+│   │   ├── banner.jpg
+│   │   ├── banner01.jpg
+│   │   ├── banner02.jpg
+│   │   ├── banner03.jpg
+│   │   ├── default-avatar.svg
+│   │   ├── facebook.png
+│   │   ├── instagram.png
+│   │   ├── questionshomeimage.jpg
+│   │   ├── tutorialshomeimage.jpg
+│   │   └── twitter.png
+│   └── vite.svg
+├── README.md
+├── server
+│   ├── index.js
+│   ├── package-lock.json
+│   ├── package.json
+│   └── routes
+│       └── subscribe.js
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── auth
+│   │   └── AuthProvider.jsx
+│   ├── components
+│   │   ├── ArticleCard.jsx
+│   │   ├── auth
+│   │   │   └── AuthModal.jsx
+│   │   ├── CardGrid.jsx
+│   │   ├── common
+│   │   │   └── BackButton.jsx
+│   │   ├── EmailSignup.jsx
+│   │   ├── ErrorBoundary.jsx
+│   │   ├── HeaderBar.jsx
+│   │   ├── HeroBanner.jsx
+│   │   ├── home
+│   │   │   ├── FeaturedSection.jsx
+│   │   │   ├── HeroCarousel.jsx
+│   │   │   └── HomeToggleBar.jsx
+│   │   ├── newpost
+│   │   │   ├── ArticleForm.jsx
+│   │   │   ├── NewPostModal.jsx
+│   │   │   ├── PostTypeSwitch.jsx
+│   │   │   ├── QuestionForm.jsx
+│   │   │   ├── SubmitBar.jsx
+│   │   │   ├── TagsInput.jsx
+│   │   │   └── TutorialForm.jsx
+│   │   ├── profile
+│   │   │   ├── DeleteAccountButton.jsx
+│   │   │   └── ProfileModal.jsx
+│   │   ├── questions
+│   │   │   ├── AnswerThread.jsx
+│   │   │   ├── QuestionCard.jsx
+│   │   │   └── QuestionsFilterBar.jsx
+│   │   ├── SectionTitle.jsx
+│   │   ├── SiteFooter.jsx
+│   │   └── TutorialCard.jsx
+│   ├── config
+│   │   ├── appConfig.js
+│   │   ├── homeConfig.js
+│   │   ├── routes.js
+│   │   └── text.js
+│   ├── config.js
+│   ├── data
+│   │   ├── generateArticles.js
+│   │   ├── generateTutorials.js
+│   │   └── postSchema.js
+│   ├── firebase
+│   │   ├── app.js
+│   │   ├── index.js
+│   │   ├── posts.js
+│   │   └── storage.js
+│   ├── hooks
+│   │   └── useAuth.js
+│   ├── index.css
+│   ├── main.jsx
+│   ├── pages
+│   │   ├── ArticleDetailPage.jsx
+│   │   ├── ArticlesPage.jsx
+│   │   ├── HomePage.jsx
+│   │   ├── NewPostPage.jsx
+│   │   ├── PlansPage.jsx
+│   │   ├── QuestionDetailPage.jsx
+│   │   ├── QuestionsPage.jsx
+│   │   ├── SearchPage.jsx
+│   │   ├── TutorialDetailPage.jsx
+│   │   └── TutorialsPage.jsx
+│   ├── routes
+│   │   └── RequireAuth.jsx
+│   ├── services
+│   │   ├── account.js
+│   │   └── posts.js
+│   ├── state
+│   │   └── usePostForm.js
+│   ├── styles
+│   │   ├── auth.css
+│   │   ├── profile.css
+│   │   └── tokens.css
+│   ├── theme.css
+│   └── utils
+│       ├── firebaseErrors.js
+│       └── validation.js
+└── vite.config.js
+
+25 directories, 93 files

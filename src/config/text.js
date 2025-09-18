@@ -1,0 +1,36 @@
+// src/config/text.js
+export const TEXT = Object.freeze({
+    appName: 'DEV@Deakin',
+    login: 'Login',
+    logout: 'Log Out',
+    signup: 'Sign up',
+    myProfile: 'My Profile',
+    plans: 'Subscription Plans',
+    errors: {
+        required: 'This field is required.',
+        email: 'Please enter a valid email.',
+        pwMatch: 'Passwords must match.',
+        pwWeak: 'Password must be at least 6 characters.',
+        loginFailed: 'Invalid email or password.',
+        generic: 'Something went wrong. Please try again.',
+    },
+    auth: {
+        loginTitle: 'Welcome Back',
+        loginSubtitle: 'Enter your email and password to access your account.',
+        signupTitle: 'Create a DEV@Deakin account',
+        signupSubtitle: 'Join now to streamline your experience.',
+        resetTitle: 'Reset your password',
+        resetSubtitle: 'Enter your email and we’ll send you a reset link.',
+        resetCTA: 'Send reset link',
+        resetSent: 'If an account exists for that email, a reset link has been sent.',
+        backToLogin: 'Back to login',
+        forgot: 'Forgot your password?',
+    },
+    profile: {
+        title: 'Your profile',
+        subtitle: 'Update your name and photo.',
+        saved: 'Profile updated.',
+        pwTitle: 'Change password',
+        pwSaved: 'Password updated.',
+    },
+});
