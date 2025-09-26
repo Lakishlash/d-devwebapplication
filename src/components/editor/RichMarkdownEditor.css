@@ -1,0 +1,145 @@
+/* Container */
+.rme {
+    --r: 14px;
+    --bd: 1px;
+    --bg: #fff;
+}
+
+.rme .rme-toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    background: #f7f8fb;
+    border: 1px solid #e6e7eb;
+    border-radius: 12px 12px 0 0;
+}
+
+.rme .rme-toolbar button {
+    padding: 6px 10px;
+    border: 1px solid #dfe1e6;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.rme .rme-toolbar .rme-spacer {
+    flex: 1;
+}
+
+.rme .rme-body {
+    border: 1px solid #e6e7eb;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    background: #fff;
+    padding: 0;
+}
+
+/* === Editors === */
+/* Textarea (rich) */
+.rme-textarea {
+    display: block;
+    width: 100%;
+    min-height: 220px;
+    padding: 14px;
+    resize: vertical;
+    border: none;
+    outline: none;
+    line-height: 1.5;
+    font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* CodeMirror (markdown) – make sure caret starts at top, not middle */
+.cm-editor {
+    border: none;
+    outline: none;
+}
+
+.cm-scroller {
+    overflow: auto;
+}
+
+.cm-content {
+    min-height: 220px;
+    /* ensures top-start layout */
+    padding: 14px !important;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+/* Upload tray (no raw URL shown) */
+.rme-tray {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 12px 2px;
+    border-top: 1px dashed #eee;
+    background: #fafbff;
+}
+
+.rme-chip {
+    display: flex;
+    gap: 10px;
+    padding: 8px;
+    border: 1px solid #e5e7ef;
+    border-radius: 10px;
+    background: #fff;
+    align-items: center;
+}
+
+.rme-chip-thumb img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+}
+
+.rme-chip-pdf {
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: #f3f5ff;
+    color: #3b5bfd;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rme-chip-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rme-chip-name {
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    color: #333;
+}
+
+.rme-chip-insert {
+    padding: 4px 8px;
+    font-size: 12px;
+    border: 1px solid #d1d5fe;
+    background: #edf0ff;
+    color: #3b5bfd;
+    border-radius: 7px;
+}
+
+/* Live preview */
+.rme-preview {
+    border-top: 1px solid #eef0f5;
+    padding: 16px;
+}
+
+/* Small tip */
+.rme-tip {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #778;
+}

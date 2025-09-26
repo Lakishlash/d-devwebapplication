@@ -3,6 +3,8 @@ import 'semantic-ui-css/semantic.min.css';
 import './theme.css';
 import './styles/tokens.css';
 import './styles/auth.css';
+import "./styles/markdown.css";
+
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

@@ -1,13 +1,46 @@
-// src/components/newpost/TutorialForm.jsx
-// Tutorial-specific form: thumbnail (image), optional video, title, description, tags.
-// IMPORTANT: Uses the SAME TagsInput prop names as other forms:
-//   tags, addTag, removeTag, popTag  ← so Enter-to-add works.
+// Tutorial form with image/video pickers + Markdown editor for Description.
+// Requires: npm i react-markdown remark-gfm
 
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Form, Button } from "semantic-ui-react";
+import ReactMarkdown from "react-markdown";
+import gfm from "remark-gfm";
 import { THEME } from "@/config";
 import { SCHEMA } from "@/data/postSchema";
 import TagsInput from "./TagsInput";
+
+function MarkdownEditor({ label, value, onChange, error, minRows = 10, placeholder }) {
+    const [tab, setTab] = useState("write");
+    return (
+        <Form.Field error={!!error}>
+            <label style={{ fontWeight: 600, color: THEME.colors.text }}>{label}</label>
+
+            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                <Button type="button" size="tiny" basic={tab !== "write"} primary={tab === "write"} onClick={() => setTab("write")}>
+                    Write
+                </Button>
+                <Button type="button" size="tiny" basic={tab !== "preview"} primary={tab === "preview"} onClick={() => setTab("preview")}>
+                    Preview
+                </Button>
+            </div>
+
+            {tab === "write" ? (
+                <Form.TextArea
+                    placeholder={placeholder}
+                    value={value || ""}
+                    onChange={(e, { value }) => onChange?.(value)}
+                    style={{ minHeight: minRows * 18, fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}
+                />
+            ) : (
+                <div className="md-prose" style={{ padding: 12, background: "#fff", borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,.06)" }}>
+                    <ReactMarkdown remarkPlugins={[gfm]}>{value || "_Nothing to preview yet…_"}</ReactMarkdown>
+                </div>
+            )}
+
+            {error && <div style={{ color: "#9f3a38", marginTop: 6, fontSize: 12 }}>{error}</div>}
+        </Form.Field>
+    );
+}
 
 export default function TutorialForm({
     // shared
@@ -42,14 +75,7 @@ export default function TutorialForm({
                         }}
                         aria-label="Choose thumbnail image"
                     />
-                    <Button
-                        type="button"
-                        basic
-                        size="small"
-                        disabled={!imageFile && !previewUrl}
-                        onClick={() => setImageFile?.(null)}
-                        content="Remove"
-                    />
+                    <Button type="button" basic size="small" disabled={!imageFile && !previewUrl} onClick={() => setImageFile?.(null)} content="Remove" />
                 </div>
                 <div style={{ fontSize: 12, marginTop: 6, color: "#777" }}>
                     {ST.thumbnail?.helper ?? "The image uploads when you click Post."}
@@ -67,23 +93,8 @@ export default function TutorialForm({
                     {ST.video?.label ?? "Video"} <span style={{ color: "#888" }}>(optional)</span>
                 </label>
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                    <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) setVideoFile?.(f);
-                        }}
-                        aria-label="Choose tutorial video"
-                    />
-                    <Button
-                        type="button"
-                        basic
-                        size="small"
-                        disabled={!videoFile}
-                        onClick={() => setVideoFile?.(null)}
-                        content="Remove"
-                    />
+                    <input type="file" accept="video/*" onChange={(e) => setVideoFile?.(e.target.files?.[0] || null)} aria-label="Choose tutorial video" />
+                    <Button type="button" basic size="small" disabled={!videoFile} onClick={() => setVideoFile?.(null)} content="Remove" />
                 </div>
                 <div style={{ fontSize: 12, marginTop: 6, color: "#777" }}>
                     {ST.video?.helper ?? "Common formats: mp4, mov, webm."}
@@ -100,18 +111,17 @@ export default function TutorialForm({
                 error={errors?.title ? { content: errors.title, pointing: "below" } : null}
             />
 
-            {/* Description */}
-            <Form.TextArea
-                label={ST.description?.label ?? "Description"}
+            {/* Markdown Description */}
+            <MarkdownEditor
+                label={ST.description?.label ?? "Description (Markdown supported)"}
+                value={tutorialDescription}
+                onChange={setTutorialDescription}
+                error={errors?.tutorialDescription}
+                minRows={12}
                 placeholder={ST.description?.placeholder ?? "Describe what this tutorial covers…"}
-                value={tutorialDescription ?? ""}
-                onChange={(e, { value }) => setTutorialDescription?.(value)}
-                onBlur={onBlur}
-                error={errors?.tutorialDescription ? { content: errors.tutorialDescription, pointing: "below" } : null}
-                style={{ minHeight: 120 }}
             />
 
-            {/* Tags — SAME prop names your other forms use */}
+            {/* Tags */}
             <Form.Field error={Boolean(errors?.tags)}>
                 <label style={{ fontWeight: 600, color: THEME.colors.text }}>
                     {C.tags?.label ?? "Tags"}
@@ -124,9 +134,7 @@ export default function TutorialForm({
                     max={SCHEMA?.maxTags ?? 3}
                     placeholder={C.tags?.helper ?? "Add a tag and press Enter (max 3)"}
                 />
-                {errors?.tags && (
-                    <div style={{ color: "#9f3a38", marginTop: 6, fontSize: 12 }}>{errors.tags}</div>
-                )}
+                {errors?.tags && <div style={{ color: "#9f3a38", marginTop: 6, fontSize: 12 }}>{errors.tags}</div>}
             </Form.Field>
         </>
     );

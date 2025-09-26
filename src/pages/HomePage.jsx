@@ -1,113 +1,113 @@
 // src/pages/HomePage.jsx
-// Home page: Carousel → Toggle bar → 3 featured sections (live data).
+// Replace old FeaturedSection blocks with two magazine rows (Articles + Tutorials).
+// Shows the pricing block at the end ONLY when signed out (as before).
 
 import { useEffect, useMemo, useState } from "react";
 import { Container } from "semantic-ui-react";
+import { getApp } from "firebase/app";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import HeroCarousel from "@/components/home/HeroCarousel.jsx";
 import HomeToggleBar from "@/components/home/HomeToggleBar.jsx";
-import FeaturedSection from "@/components/home/FeaturedSection.jsx";
+import FeaturedRow from "@/components/home/FeaturedRow.jsx";
+import PricingPlans from "@/components/PricingPlans.jsx";
 
 import { THEME } from "@/config.js";
-import { CAROUSEL_IMAGES, SECTIONS } from "@/config/homeConfig";
-import {
-    watchArticles,
-    watchTutorials,
-    watchQuestions,
-} from "@/services/posts";
+import { CAROUSEL_IMAGES } from "@/config/homeConfig";
+import { watchArticles, watchTutorials } from "@/services/posts";
 
-// Helper: simple, stable fallback so article/tutorial tiles never collapse
-const fallbackImg = (seed, w = 800, h = 450) =>
-    `https://picsum.photos/seed/${encodeURIComponent(String(seed || "seed"))}/${w}/${h}`;
+// small helper for consistent fallback images (not hardcoded content)
+const fallbackImg = (seed, w = 960, h = 540) =>
+    `https://picsum.photos/seed/${encodeURIComponent(String(seed || "dev"))}/${w}/${h}`;
+
+// derive a pill/tag safely from doc shape
+function deriveTags(doc, fallback = "News") {
+    if (Array.isArray(doc?.tags) && doc.tags.length) return doc.tags;
+    if (doc?.category) return [String(doc.category)];
+    return [fallback];
+}
 
 export default function HomePage() {
-    // live data
     const [articles, setArticles] = useState([]);
     const [tutorials, setTutorials] = useState([]);
-    const [questions, setQuestions] = useState([]);
+    const [isAuthed, setIsAuthed] = useState(false);
+    const [authReady, setAuthReady] = useState(false);
 
-    // subscribe once (unsub on unmount)
+    // auth (to decide whether to append pricing)
+    useEffect(() => {
+        const unsub = onAuthStateChanged(getAuth(getApp()), (u) => {
+            setIsAuthed(!!u);
+            setAuthReady(true);
+        });
+        return () => unsub && unsub();
+    }, []);
+
+    // live data
     useEffect(() => {
         const ua = watchArticles((rows) => setArticles(rows || []));
         const ut = watchTutorials((rows) => setTutorials(rows || []));
-        const uq = watchQuestions((rows) => setQuestions(rows || []));
         return () => {
             ua && ua();
             ut && ut();
-            uq && uq();
         };
     }, []);
 
-    // newest 3 (watchers are already sorted desc by createdAt)
+    // take newest 3
     const topArticles = useMemo(() => (articles || []).slice(0, 3), [articles]);
     const topTutorials = useMemo(() => (tutorials || []).slice(0, 3), [tutorials]);
-    const topQuestions = useMemo(() => (questions || []).slice(0, 3), [questions]);
 
-    // shape for FeaturedSection: { id, title, description, image|null, href }
+    // shape for cards
     const articleItems = useMemo(
         () =>
-            topArticles.map((a) => ({
+            topArticles.map((a, i) => ({
                 id: a.id,
                 title: a.title || "Article",
                 description: a.abstract || "",
-                image: a.imageUrl || fallbackImg(a.id || a.title),
+                image: a.imageUrl || fallbackImg(a.id || a.title || i),
                 href: `/articles/${a.id}`,
+                tags: deriveTags(a, i % 2 ? "Tips & Tricks" : "News"),
             })),
         [topArticles]
     );
 
     const tutorialItems = useMemo(
         () =>
-            topTutorials.map((t) => ({
+            topTutorials.map((t, i) => ({
                 id: t.id,
                 title: t.title || "Tutorial",
                 description: t.description || "",
-                image: t.imageUrl || fallbackImg(t.id || t.title),
+                image: t.imageUrl || fallbackImg(t.id || t.title || i),
                 href: `/tutorials/${t.id}`,
+                tags: deriveTags(t, i % 2 ? "Beginner" : "Guide"),
             })),
         [topTutorials]
     );
 
-    // IMPORTANT: no images for questions (pass null) so those tiles render text-only
-    const questionItems = useMemo(
-        () =>
-            topQuestions.map((q) => ({
-                id: q.id,
-                title: q.title || "Question",
-                description: "Click to explore community Q&A.",
-                image: null, // ← no image on question tiles
-                href: `/questions/${q.id}`,
-            })),
-        [topQuestions]
-    );
-
     return (
-        <main style={{ background: THEME.colors.pageBg || "#f5f5f7" }}>
+        <main style={{ background: THEME?.colors?.pageBg || "#f5f5f7" }}>
             <Container style={{ paddingTop: 20, paddingBottom: 28 }}>
-                {/* 1) Hero carousel */}
+                {/* hero + segmented control (kept) */}
                 <HeroCarousel images={CAROUSEL_IMAGES} height={380} />
-
-                {/* 2) segmented toggle + search */}
                 <HomeToggleBar />
 
-                {/* 3) Featured sections (live) */}
-                <FeaturedSection
-                    title={SECTIONS.articles.title}
-                    heroImage={SECTIONS.articles.heroImage}
+                {/* ARTICLES row */}
+                <FeaturedRow
+                    eyebrow="ARTICLES"
+                    title="Articles of Dev"
+                    subtitle="Latest writing from the DEV@Deakin community."
                     items={articleItems}
                 />
 
-                <FeaturedSection
-                    title={SECTIONS.tutorials.title}
-                    heroImage={SECTIONS.tutorials.heroImage}
+                {/* TUTORIALS row */}
+                <FeaturedRow
+                    eyebrow="TUTORIALS"
+                    title="Learn by Doing"
+                    subtitle="Hands-on guides and walkthroughs for building modern apps."
                     items={tutorialItems}
                 />
 
-                <FeaturedSection
-                    title={SECTIONS.questions.title}
-                    heroImage={SECTIONS.questions.heroImage}
-                    items={questionItems}
-                />
+                {/* pricing for signed-out users only, no CTAs */}
+                {authReady && !isAuthed && <PricingPlans showCtas={false} />}
             </Container>
         </main>
     );

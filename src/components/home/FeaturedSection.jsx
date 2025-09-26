@@ -1,10 +1,8 @@
 // src/components/home/FeaturedSection.jsx
-// Microsoft-like section: left hero + responsive grid on the right.
-// Cards are equal-height and top-aligned.
+// Updated section using FeaturedCardModern on the right grid.
+// Left side keeps a simple hero with big heading + short tagline.
 
-import { Card } from "semantic-ui-react";
-import { Link } from "react-router-dom";
-import { UI } from "../../config/homeConfig";
+import FeaturedCardModern from "@/components/home/FeaturedCardModern.jsx";
 
 export default function FeaturedSection({ title, heroImage, items = [] }) {
     return (
@@ -29,22 +27,11 @@ export default function FeaturedSection({ title, heroImage, items = [] }) {
                     }}
                 >
                     {heroImage ? (
-                        <div
-                            style={{
-                                width: "100%",
-                                height: 220,
-                                overflow: "hidden",
-                            }}
-                        >
+                        <div style={{ width: "100%", height: 220, overflow: "hidden" }}>
                             <img
                                 src={heroImage}
                                 alt=""
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    display: "block",
-                                }}
+                                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                             />
                         </div>
                     ) : null}
@@ -53,71 +40,24 @@ export default function FeaturedSection({ title, heroImage, items = [] }) {
                         <h2
                             style={{
                                 margin: 0,
-                                fontFamily: "Poppins, sans-serif",
-                                fontWeight: 500,
-                                color: UI.text,
+                                fontFamily: "Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+                                fontWeight: 600,
+                                color: "var(--ink, #313131)",
+                                fontSize: 22,
                             }}
                         >
                             {title}
                         </h2>
-                        <p style={{ marginTop: 6, color: "#666" }}>
+                        <p style={{ marginTop: 6, color: "rgba(0,0,0,0.65)" }}>
                             Fresh picks curated for you.
                         </p>
                     </div>
                 </div>
 
-                {/* Right responsive grid */}
+                {/* Right responsive grid (uses existing .feature-grid CSS) */}
                 <div className="feature-grid">
                     {items.map((it) => (
-                        <Card
-                            key={it.id}
-                            raised
-                            style={{
-                                margin: 0,                 // kill default SUI margin
-                                borderRadius: 18,
-                                overflow: "hidden",
-                                height: "100%",            // equal height
-                                display: "flex",
-                                flexDirection: "column",
-                            }}
-                        >
-                            {/* Fixed-height media wrapper ensures aligned rows */}
-                            {it.image ? (
-                                <div style={{ width: "100%", height: 180, overflow: "hidden" }}>
-                                    <img
-                                        src={it.image}
-                                        alt=""
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                            display: "block",
-                                        }}
-                                    />
-                                </div>
-                            ) : null}
-
-                            <Card.Content style={{ flex: "1 1 auto" }}>
-                                <Card.Header
-                                    style={{ color: UI.text, fontFamily: "Poppins, sans-serif" }}
-                                >
-                                    {it.title}
-                                </Card.Header>
-                                {it.description && (
-                                    <Card.Description style={{ color: "#666" }}>
-                                        {it.description}
-                                    </Card.Description>
-                                )}
-                            </Card.Content>
-
-                            {it.href && (
-                                <Card.Content extra style={{ flex: "0 0 auto" }}>
-                                    <Link to={it.href} style={{ color: UI.primary, fontWeight: 500 }}>
-                                        Learn more
-                                    </Link>
-                                </Card.Content>
-                            )}
-                        </Card>
+                        <FeaturedCardModern key={it.id} item={it} />
                     ))}
                 </div>
             </div>

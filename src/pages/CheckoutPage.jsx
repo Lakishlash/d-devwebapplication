@@ -1,29 +1,20 @@
 // src/pages/CheckoutPage.jsx
-// Purpose: Secure checkout using Stripe Elements + callable function (no hardcoding).
-// Fix: Use Firebase getApp() instead of importing a default app from ../firebase/app.
+// Stripe Elements checkout. "Pay now" styled like your blue buttons even when disabled.
 
 import { useEffect, useMemo, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
-import {
-    Elements,
-    PaymentElement,
-    useStripe,
-    useElements,
-} from "@stripe/react-stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-import { THEME } from "@/config.js"; // keep your theme; adjust path if needed
+import { THEME } from "@/config.js";
 
-// Read from env (no hardcoding)
 const PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const PRICE_ID_PREMIUM = import.meta.env.VITE_STRIPE_PRICE_PREMIUM;
 
-// Initialize Stripe (publishable key is safe in client)
 const stripePromise = loadStripe(PUBLISHABLE_KEY);
 
-// Mark user as premium in Firestore (allowed by your current rules)
 async function markUserPremium(db, uid) {
     await setDoc(doc(db, "users", uid), { premium: true }, { merge: true });
 }
@@ -57,9 +48,7 @@ function CheckoutForm() {
                 const app = getApp();
                 const auth = getAuth(app);
                 const db = getFirestore(app);
-                if (auth.currentUser?.uid) {
-                    await markUserPremium(db, auth.currentUser.uid);
-                }
+                if (auth.currentUser?.uid) await markUserPremium(db, auth.currentUser.uid);
                 setSuccess(true);
             } else {
                 setErrorMessage("Payment was not completed.");
@@ -74,9 +63,7 @@ function CheckoutForm() {
     if (success) {
         return (
             <div className="ui segment" style={{ background: THEME?.colors?.soft }}>
-                <h2 className="ui header" style={{ color: THEME?.colors?.text }}>
-                    Payment successful 🎉
-                </h2>
+                <h2 className="ui header" style={{ color: THEME?.colors?.text }}>Payment successful 🎉</h2>
                 <p style={{ color: THEME?.colors?.text }}>
                     Your account has been upgraded to <strong>Premium</strong>.
                 </p>
@@ -96,14 +83,21 @@ function CheckoutForm() {
                 </div>
             )}
 
+            {/* Primary blue even when disabled */}
             <button
                 type="submit"
-                className="ui button"
                 disabled={!stripe || submitting}
                 style={{
-                    background: THEME?.colors?.primary,
+                    background: "var(--brand, #0171e3)",
                     color: "#fff",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "10px 16px",
+                    fontWeight: 600,
                     marginTop: "1rem",
+                    opacity: !stripe || submitting ? 0.6 : 1,
+                    cursor: !stripe || submitting ? "not-allowed" : "pointer",
+                    boxShadow: "0 6px 16px rgba(1,113,227,0.25)",
                 }}
             >
                 {submitting ? "Processing…" : "Pay now"}
@@ -138,22 +132,11 @@ export default function CheckoutPage() {
         run();
     }, []);
 
-    const options = useMemo(
-        () => ({
-            clientSecret,
-            appearance: { theme: "stripe" },
-        }),
-        [clientSecret]
-    );
+    const options = useMemo(() => ({ clientSecret, appearance: { theme: "stripe" } }), [clientSecret]);
 
     return (
-        <div
-            className="ui container"
-            style={{ background: THEME?.colors?.soft, minHeight: "60vh", padding: "2rem 0" }}
-        >
-            <h1 className="ui header" style={{ color: THEME?.colors?.text }}>
-                Checkout
-            </h1>
+        <div className="ui container" style={{ background: THEME?.colors?.soft, minHeight: "60vh", padding: "2rem 0" }}>
+            <h1 className="ui header" style={{ color: THEME?.colors?.text }}>Checkout</h1>
 
             {initError && <div className="ui negative message">{initError}</div>}
 

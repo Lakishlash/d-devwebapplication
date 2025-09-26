@@ -1,15 +1,14 @@
 // src/components/questions/QuestionCard.jsx
-// Card for a single question.
-// - Owner-only kebab: View / Edit / Delete
-// - Hide/Unhide buttons preserved
-// - Optional inline "Show details" (description + answers)
-
 import { useState } from "react";
 import { Segment, Header, Label, Button, Icon, Dropdown } from "semantic-ui-react";
 import { Link, useNavigate } from "react-router-dom";
 import { THEME } from "@/config";
 import { useAuth } from "@/auth/AuthProvider";
 import { deletePost } from "@/services/posts";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeHighlight from "rehype-highlight";
 
 export default function QuestionCard({ item, isHidden = false, onHide, onUnhide }) {
     const nav = useNavigate();
@@ -22,12 +21,7 @@ export default function QuestionCard({ item, isHidden = false, onHide, onUnhide 
     async function onDelete() {
         const ok = window.confirm("Delete this question? This cannot be undone.");
         if (!ok) return;
-        try {
-            await deletePost(item.id); // (Optional) use deleteQuestionCascade if you want best-effort subcollection cleanup
-            // The list updates via onSnapshot in QuestionsPage
-        } catch (e) {
-            alert(e?.message || "Failed to delete question.");
-        }
+        try { await deletePost(item.id); } catch (e) { alert(e?.message || "Failed to delete question."); }
     }
 
     const trigger = (
@@ -37,40 +31,25 @@ export default function QuestionCard({ item, isHidden = false, onHide, onUnhide 
     );
 
     return (
-        <Segment
-            style={{
-                background: "#fff",
-                borderRadius: 18,
-                boxShadow: "0 8px 20px rgba(0,0,0,.06)",
-            }}
-        >
+        <Segment style={{ background: "#fff", borderRadius: 18, boxShadow: "0 8px 20px rgba(0,0,0,.06)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between" }}>
                 <div>
-                    <Header as="h4" style={{ margin: 0, color: THEME.colors.text }}>
-                        {item?.title}
-                    </Header>
+                    <Header as="h4" style={{ margin: 0, color: THEME.colors.text }}>{item?.title}</Header>
                     <div style={{ color: "#666", fontSize: 12, marginTop: 4 }}>{created}</div>
                     <div style={{ marginTop: 6 }}>
                         {(item?.tags || []).map((t) => (
-                            <Label key={t} basic style={{ borderRadius: 12, marginRight: 6, marginBottom: 6 }}>
-                                #{t}
-                            </Label>
+                            <Label key={t} basic style={{ borderRadius: 12, marginRight: 6, marginBottom: 6 }}>#{t}</Label>
                         ))}
                     </div>
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     {isHidden ? (
-                        <Button basic onClick={onUnhide} style={{ borderRadius: 12 }}>
-                            <Icon name="eye" /> Unhide
-                        </Button>
+                        <Button basic onClick={onUnhide} style={{ borderRadius: 12 }}><Icon name="eye" /> Unhide</Button>
                     ) : (
-                        <Button basic onClick={onHide} style={{ borderRadius: 12 }}>
-                            <Icon name="eye slash" /> Hide
-                        </Button>
+                        <Button basic onClick={onHide} style={{ borderRadius: 12 }}><Icon name="eye slash" /> Hide</Button>
                     )}
 
-                    {/* Owner-only kebab */}
                     {mine && (
                         <Dropdown pointing="top right" icon={null} trigger={trigger}>
                             <Dropdown.Menu>
@@ -82,19 +61,13 @@ export default function QuestionCard({ item, isHidden = false, onHide, onUnhide 
                         </Dropdown>
                     )}
 
-                    {/* Quick view button for everyone */}
-                    <Button
-                        primary
-                        as={Link}
-                        to={`/questions/${item.id}`}
-                        style={{ background: THEME.colors.accent, color: "#fff", borderRadius: 12 }}
-                    >
+                    <Button primary as={Link} to={`/questions/${item.id}`}
+                        style={{ background: THEME.colors.accent, color: "#fff", borderRadius: 12 }}>
                         Details
                     </Button>
                 </div>
             </div>
 
-            {/* Inline details toggle (kept from your previous UX) */}
             <div style={{ marginTop: 10 }}>
                 <Button basic size="small" onClick={() => setOpen((s) => !s)} style={{ borderRadius: 12 }}>
                     {open ? "Hide details" : "Show details"}
@@ -102,9 +75,13 @@ export default function QuestionCard({ item, isHidden = false, onHide, onUnhide 
             </div>
 
             {open && (
-                <div style={{ marginTop: 12 }}>
-                    <p style={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{item?.description}</p>
-                    {/* You already render AnswerThread on the detail page; leave inline thread out to avoid duplication */}
+                <div style={{ marginTop: 12 }} className="md md--card">
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+                    >
+                        {item?.description || ""}
+                    </ReactMarkdown>
                 </div>
             )}
         </Segment>

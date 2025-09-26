@@ -4,6 +4,11 @@ import {
     Container, Segment, Header, Image, Label, Message,
     Form, Button, Input
 } from "semantic-ui-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeHighlight from "rehype-highlight";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { THEME } from "@/config";
 import { useAuth } from "@/auth/AuthProvider";
@@ -36,10 +41,9 @@ export default function ArticleDetailPage() {
         () => (imageFile ? URL.createObjectURL(imageFile) : null),
         [imageFile]
     );
+    useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
 
     const mine = !!(user?.uid && post?.author?.uid === user.uid);
-
-    useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
 
     useEffect(() => {
         const unsub = watchPost(
@@ -60,29 +64,18 @@ export default function ArticleDetailPage() {
     }, [id, editing]);
 
     // tag helpers for TagsInput
-    const addTag = (t) => setTags((xs) =>
-        xs.length >= 3 ? xs : [...xs, t].filter(Boolean)
-    );
-    const removeTag = (i) =>
-        setTags((xs) => xs.filter((_, idx) => idx !== i));
+    const addTag = (t) => setTags((xs) => (xs.length >= 3 ? xs : [...xs, t].filter(Boolean)));
+    const removeTag = (i) => setTags((xs) => xs.filter((_, idx) => idx !== i));
     const popTag = () => setTags((xs) => xs.slice(0, -1));
 
     async function save() {
         try {
             setBusy(true);
-
             let imageUrl = post?.imageUrl || null;
             if (imageFile && user?.uid) {
                 imageUrl = await uploadArticleImage(user.uid, imageFile);
             }
-
-            await updatePost(id, {
-                title,
-                abstract,
-                body,
-                tags,
-                imageUrl,
-            });
+            await updatePost(id, { title, abstract, body, tags, imageUrl });
             setEditing(false);
         } catch (e) {
             setErr(e?.message || "Failed to update article.");
@@ -121,6 +114,7 @@ export default function ArticleDetailPage() {
                                 <Header as="h2" style={{ color: THEME.colors.text, fontFamily: "Poppins, sans-serif" }}>
                                     {post?.title || "Article"}
                                 </Header>
+
                                 <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
                                     <Label image>
                                         <img src={post?.author?.photoURL || "/assets/default-avatar.svg"} alt="" />
@@ -137,11 +131,22 @@ export default function ArticleDetailPage() {
                                     />
                                 )}
 
-                                <p style={{ fontWeight: 600, marginBottom: 8 }}>{post?.abstract}</p>
-                                <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{post?.body}</div>
+                                {post?.abstract && (
+                                    <p style={{ fontWeight: 600, marginBottom: 12 }}>{post.abstract}</p>
+                                )}
+
+                                {/* Markdown body */}
+                                <div className="md">
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                        rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
+                                    >
+                                        {post?.body || ""}
+                                    </ReactMarkdown>
+                                </div>
 
                                 {mine && (
-                                    <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                                    <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
                                         <Button size="small" onClick={() => setEditing(true)}>Edit</Button>
                                         <Button size="small" negative onClick={remove}>Delete</Button>
                                     </div>
@@ -170,12 +175,11 @@ export default function ArticleDetailPage() {
                                         onChange={(_, { value }) => setAbstract(value)}
                                     />
                                     <Form.TextArea
-                                        label="Body"
-                                        rows={10}
+                                        label="Body (Markdown supported)"
+                                        rows={12}
                                         value={body}
                                         onChange={(_, { value }) => setBody(value)}
                                     />
-
                                     <Form.Field>
                                         <label>Featured image</label>
                                         <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
@@ -185,7 +189,6 @@ export default function ArticleDetailPage() {
                                             </div>
                                         )}
                                     </Form.Field>
-
                                     <Form.Field>
                                         <label>Tags</label>
                                         <TagsInput
@@ -197,18 +200,11 @@ export default function ArticleDetailPage() {
                                             placeholder="Add a tag and press Enter (max 3)"
                                         />
                                     </Form.Field>
-
-                                    <Button
-                                        primary
-                                        onClick={save}
-                                        loading={busy}
-                                        style={{ background: THEME.colors.accent, color: "#fff" }}
-                                    >
+                                    <Button primary onClick={save} loading={busy}
+                                        style={{ background: THEME.colors.accent, color: "#fff" }}>
                                         Save
                                     </Button>
-                                    <Button basic onClick={() => { setEditing(false); }}>
-                                        Cancel
-                                    </Button>
+                                    <Button basic onClick={() => setEditing(false)}>Cancel</Button>
                                 </Form>
                             </>
                         )}

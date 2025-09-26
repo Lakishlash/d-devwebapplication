@@ -1,13 +1,23 @@
-import { Form } from "semantic-ui-react";
-import { SCHEMA, POST_TYPES } from "../../data/postSchema";
-import TagsInput from "./TagsInput";
+// src/components/newpost/QuestionForm.jsx
+// Question form with Rich Markdown editor + image/PDF uploads.
 
-export default function QuestionForm(props) {
-    const {
-        title, setTitle, onBlur, errors = {},
-        questionBody, setQuestionBody,
-        tags, addTag, removeTag, popTag,
-    } = props;
+import { Form } from "semantic-ui-react";
+import { SCHEMA, POST_TYPES } from "@/data/postSchema";
+import TagsInput from "./TagsInput";
+import RichMarkdownEditor from "@/components/editor/RichMarkdownEditor";
+import { getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { uploadQAImage, uploadQAPdf } from "@/services/posts";
+
+export default function QuestionForm({
+    title, setTitle, onBlur, errors = {},
+    questionBody, setQuestionBody,
+    tags, addTag, removeTag, popTag,
+}) {
+    const uid = getAuth(getApp()).currentUser?.uid || null;
+
+    const upImage = uid ? (f) => uploadQAImage(uid, f) : undefined;
+    const upPdf = uid ? (f) => uploadQAPdf(uid, f) : undefined;
 
     return (
         <>
@@ -19,15 +29,20 @@ export default function QuestionForm(props) {
                 onBlur={() => onBlur("title")}
                 error={errors.title ? { content: errors.title } : null}
             />
-            <Form.TextArea
-                label={SCHEMA.question.body.label}
-                placeholder={SCHEMA.question.body.placeholder}
-                value={questionBody}
-                onChange={(_, data) => setQuestionBody(String(data.value))}
-                onBlur={() => onBlur("questionBody")}
-                error={errors.questionBody ? { content: errors.questionBody } : null}
-                rows={8}
-            />
+
+            <Form.Field error={Boolean(errors.questionBody)}>
+                <label>{SCHEMA.question.body.label}</label>
+                <RichMarkdownEditor
+                    value={questionBody}
+                    onChange={(v) => setQuestionBody(String(v))}
+                    defaultMode="rich"
+                    defaultPreview={false}
+                    onUploadImage={upImage}
+                    onUploadPdf={upPdf}
+                />
+                {errors.questionBody && <div style={{ color: "#9f3a38", marginTop: 6 }}>{errors.questionBody}</div>}
+            </Form.Field>
+
             <TagsInput
                 tags={tags}
                 addTag={addTag}

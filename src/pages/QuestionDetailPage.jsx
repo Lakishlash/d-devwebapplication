@@ -1,22 +1,24 @@
 // src/pages/QuestionDetailPage.jsx
-// Question detail + owner edit/delete, plus answers thread.
-// - Owner: Edit title, description, tags; Delete question
-// - Others: Read-only
-// - Uses updatePost/deletePost from services; rules enforce ownership.
 
-import { useEffect, useMemo, useState } from "react";
+// QuestionDetailPage.jsx (full)
+// Shows Markdown for question body; owner can edit with RichMarkdownEditor.
+
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
 import { Container, Segment, Header, Label, Message, Form, Button, Input } from "semantic-ui-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { THEME } from "@/config";
 import { useAuth } from "@/auth/AuthProvider";
-import { watchPost, updatePost, deletePost } from "@/services/posts";
+import { watchPost, updatePost, deletePost, uploadQAImage, uploadQAPdf } from "@/services/posts";
 import TagsInput from "@/components/newpost/TagsInput";
 import AnswerThread from "@/components/questions/AnswerThread";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeHighlight from "rehype-highlight";
+import RichMarkdownEditor from "@/components/editor/RichMarkdownEditor";
 
-function tsToLocal(ts) {
-    return ts?.toDate ? ts.toDate().toLocaleString() : "";
-}
+function tsToLocal(ts) { return ts?.toDate ? ts.toDate().toLocaleString() : ""; }
 
 export default function QuestionDetailPage() {
     const { id } = useParams();
@@ -28,7 +30,6 @@ export default function QuestionDetailPage() {
     const [err, setErr] = useState("");
     const [busy, setBusy] = useState(false);
 
-    // editing state
     const [editing, setEditing] = useState(false);
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
@@ -36,13 +37,11 @@ export default function QuestionDetailPage() {
 
     const mine = !!(user?.uid && post?.author?.uid === user.uid);
 
-    // preload edit mode if ?edit=1
     useEffect(() => {
         const sp = new URLSearchParams(search);
         if (sp.get("edit") === "1") setEditing(true);
     }, [search]);
 
-    // watch this question
     useEffect(() => {
         const unsub = watchPost(
             id,
@@ -57,12 +56,9 @@ export default function QuestionDetailPage() {
             (e) => setErr(e?.message || "Failed to load question.")
         );
         return () => unsub && unsub();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, editing]);
 
-    // TagsInput handlers
-    const addTag = (t) =>
-        setTags((xs) => (xs.length >= 3 ? xs : [...xs, (t || "").trim()].filter(Boolean)));
+    const addTag = (t) => setTags((xs) => (xs.length >= 3 ? xs : [...xs, (t || "").trim()].filter(Boolean)));
     const removeTag = (i) => setTags((xs) => xs.filter((_, idx) => idx !== i));
     const popTag = () => setTags((xs) => xs.slice(0, -1));
 
@@ -73,8 +69,7 @@ export default function QuestionDetailPage() {
             await updatePost(id, { title, description: desc, tags });
             setEditing(false);
         } catch (e) {
-            const msg = e?.code ? `${e.code}: ${e.message}` : (e?.message || "Failed to update question.");
-            setErr(msg);
+            setErr(e?.message || "Failed to update question.");
         } finally {
             setBusy(false);
         }
@@ -85,11 +80,10 @@ export default function QuestionDetailPage() {
         if (!ok) return;
         try {
             setBusy(true);
-            await deletePost(id); // simple, reliable; see posts.js for optional cascade helper
+            await deletePost(id);
             nav("/questions");
         } catch (e) {
-            const msg = e?.code ? `${e.code}: ${e.message}` : (e?.message || "Failed to delete question.");
-            setErr(msg);
+            setErr(e?.message || "Failed to delete question.");
         } finally {
             setBusy(false);
         }
@@ -100,9 +94,7 @@ export default function QuestionDetailPage() {
             <main style={{ background: "var(--page)" }}>
                 <Container style={{ paddingTop: "1.5rem", paddingBottom: "2rem" }}>
                     <div style={{ marginBottom: 12 }}>
-                        <Link to="/questions" style={{ color: THEME.colors.accent }}>
-                            ← Back to Questions
-                        </Link>
+                        <Link to="/questions" style={{ color: THEME.colors.accent }}>← Back to Questions</Link>
                     </div>
 
                     {err && <Message error content={err} />}
@@ -122,7 +114,12 @@ export default function QuestionDetailPage() {
                                     <span style={{ color: "#666", fontSize: 13 }}>{tsToLocal(post?.createdAt)}</span>
                                 </div>
 
-                                <p style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{post?.description}</p>
+                                {/* Markdown body with safe styling + auto-fit images */}
+                                <div className="md-body" style={{ lineHeight: 1.6 }}>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize, rehypeHighlight]}>
+                                        {post?.description || ""}
+                                    </ReactMarkdown>
+                                </div>
 
                                 <div style={{ marginTop: 12 }}>
                                     {(post?.tags || []).map((t) => (
@@ -134,17 +131,13 @@ export default function QuestionDetailPage() {
 
                                 {mine && (
                                     <div style={{ marginTop: 14, display: "flex", gap: 8 }}>
-                                        <Button size="small" onClick={() => setEditing(true)}>
-                                            Edit
-                                        </Button>
-                                        <Button size="small" negative onClick={remove}>
-                                            Delete
-                                        </Button>
+                                        <Button size="small" onClick={() => setEditing(true)}>Edit</Button>
+                                        <Button size="small" negative onClick={remove}>Delete</Button>
                                     </div>
                                 )}
 
                                 {/* Answers */}
-                                <div style={{ marginTop: 20 }}>
+                                <div style={{ marginTop: 26 }}>
                                     <Header as="h3" style={{ color: THEME.colors.text }}>Answers</Header>
                                     <AnswerThread postId={id} />
                                 </div>
@@ -158,12 +151,15 @@ export default function QuestionDetailPage() {
                                         <Input value={title} onChange={(_, { value }) => setTitle(value)} />
                                     </Form.Field>
 
-                                    <Form.TextArea
-                                        label="Problem description"
-                                        rows={6}
-                                        value={desc}
-                                        onChange={(_, { value }) => setDesc(value)}
-                                    />
+                                    <Form.Field>
+                                        <label>Problem description</label>
+                                        <RichMarkdownEditor
+                                            value={desc}
+                                            onChange={setDesc}
+                                            onUploadImage={(f) => uploadQAImage(user?.uid, f)}
+                                            onUploadPdf={(f) => uploadQAPdf(user?.uid, f)}
+                                        />
+                                    </Form.Field>
 
                                     <Form.Field>
                                         <label>Tags</label>
@@ -177,17 +173,10 @@ export default function QuestionDetailPage() {
                                         />
                                     </Form.Field>
 
-                                    <Button
-                                        primary
-                                        onClick={save}
-                                        loading={busy}
-                                        style={{ background: THEME.colors.accent, color: "#fff" }}
-                                    >
+                                    <Button primary onClick={save} loading={busy} style={{ background: THEME.colors.accent, color: "#fff" }}>
                                         Save
                                     </Button>
-                                    <Button basic onClick={() => setEditing(false)}>
-                                        Cancel
-                                    </Button>
+                                    <Button basic onClick={() => setEditing(false)}>Cancel</Button>
                                 </Form>
                             </>
                         )}

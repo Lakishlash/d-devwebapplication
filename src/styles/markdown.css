@@ -1,0 +1,30 @@
+/* Generic markdown styling shared in cards & detail pages */
+.md img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    max-height: 420px;
+    /* keeps screenshots under control */
+    border-radius: 12px;
+    margin: 12px auto;
+    object-fit: contain;
+}
+
+.md pre {
+    background: #0d1220;
+    color: #e6e9f5;
+    border-radius: 12px;
+    padding: 14px;
+    overflow: auto;
+}
+
+.md code:not(pre code) {
+    background: #f3f4f8;
+    border-radius: 6px;
+    padding: 0 6px;
+}
+
+/* Optional: compact variant for list cards */
+.md.md--card img {
+    max-height: 260px;
+}

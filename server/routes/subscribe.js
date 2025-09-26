@@ -1,68 +1,62 @@
+// server/routes/subscribe.js
 import express from 'express';
 import sgMail from '@sendgrid/mail';
 import sgClient from '@sendgrid/client';
 
 const router = express.Router();
 
-const isValidEmail = (e) =>
-    typeof e === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+function getEnv() {
+    return {
+        SG_KEY: process.env.SENDGRID_API_KEY || '',
+        FROM_EMAIL: process.env.SENDGRID_FROM || process.env.SENDGRID_FROM_EMAIL || '',
+        TEMPLATE_ID: process.env.SENDGRID_TEMPLATE_ID || '',
+        LIST_ID: process.env.SENDGRID_LIST_ID || '',
+    };
+}
 
 router.post('/', async (req, res) => {
     try {
+        const { SG_KEY, FROM_EMAIL, TEMPLATE_ID, LIST_ID } = getEnv();
+        if (!SG_KEY) return res.status(500).json({ ok: false, error: 'SENDGRID_API_KEY not set' });
+        if (!FROM_EMAIL) return res.status(500).json({ ok: false, error: 'SENDGRID_FROM or SENDGRID_FROM_EMAIL not set' });
+
         const { email } = req.body || {};
-        if (!isValidEmail(email)) {
-            return res.status(400).json({ ok: false, error: 'Invalid email' });
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+            return res.status(400).json({ ok: false, error: 'Valid email is required' });
         }
 
-        // Read env at request-time (ensures dotenv has already run)
-        const {
-            SENDGRID_API_KEY,
-            SENDGRID_FROM_EMAIL,
-            SENDGRID_TEMPLATE_ID,
-            SENDGRID_LIST_ID
-        } = process.env;
+        sgMail.setApiKey(SG_KEY);
+        sgClient.setApiKey(SG_KEY);
 
-        if (!SENDGRID_API_KEY || !SENDGRID_FROM_EMAIL) {
-            return res.status(500).json({ ok: false, error: 'Server email config missing' });
-        }
-
-        // Configure clients now (not at module load)
-        sgMail.setApiKey(SENDGRID_API_KEY);
-        sgClient.setApiKey(SENDGRID_API_KEY);
-
-        // Optional: store contact in Marketing list
-        if (SENDGRID_LIST_ID) {
-            await sgClient.request({
-                method: 'PUT',
-                url: '/v3/marketing/contacts',
-                body: {
-                    list_ids: [SENDGRID_LIST_ID],
-                    contacts: [{ email }]
-                }
-            });
-        }
-
-        // Prefer a dynamic template; fallback to simple content
-        const msg = SENDGRID_TEMPLATE_ID
+        const msg = TEMPLATE_ID
             ? {
                 to: email,
-                from: SENDGRID_FROM_EMAIL,
-                templateId: SENDGRID_TEMPLATE_ID,
-                dynamicTemplateData: {}
+                from: FROM_EMAIL,
+                templateId: TEMPLATE_ID,
+                dynamic_template_data: { email },
             }
             : {
                 to: email,
-                from: SENDGRID_FROM_EMAIL,
-                subject: 'Welcome to Daily Insider',
-                text: 'Thanks for subscribing to Daily Insider.',
-                html: '<p>Thanks for subscribing to <strong>Daily Insider</strong>.</p>'
+                from: FROM_EMAIL,
+                subject: 'Thanks for subscribing!',
+                text: 'You are now subscribed to Dev@Deakin updates.',
+                html: `<p>You are now subscribed to <strong>Dev@Deakin</strong> updates.</p>`,
             };
 
         await sgMail.send(msg);
-        return res.json({ ok: true, message: 'Subscribed' });
-    } catch (err) {
-        console.error(err?.response?.body || err);
-        return res.status(500).json({ ok: false, error: 'Subscription failed' });
+
+        if (LIST_ID) {
+            await sgClient.request({
+                method: 'PUT',
+                url: '/v3/marketing/contacts',
+                body: { list_ids: [LIST_ID], contacts: [{ email }] },
+            });
+        }
+
+        return res.json({ ok: true });
+    } catch (e) {
+        console.error('[subscribe] error:', e?.response?.body || e);
+        return res.status(500).json({ ok: false, error: 'SendGrid error' });
     }
 });
 

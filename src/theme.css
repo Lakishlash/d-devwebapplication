@@ -1,3 +1,4 @@
+/* src/theme.css */
 :root {
     --bg: #f5f5f7;
     /* site background */
@@ -112,4 +113,319 @@ button {
     .feature-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* === Magazine rows === */
+.mag-row {
+    margin-top: 44px;
+}
+
+.mag-head {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.mag-eyebrow {
+    display: inline-block;
+    font-weight: 600;
+    letter-spacing: .12em;
+    font-size: .78rem;
+    color: #6b7280;
+    background: var(--soft);
+    padding: 6px 10px;
+    border-radius: 9999px;
+}
+
+.mag-h2 {
+    margin: 8px 0 6px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: var(--font);
+}
+
+.mag-sub {
+    margin: 0;
+    color: #6b7280;
+}
+
+.mag-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    align-items: start;
+}
+
+.mag-card {
+    position: relative;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.mag-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(1200px 220px at 50% 0%, rgba(1, 113, 227, .08), transparent 55%);
+    opacity: 0;
+    transition: opacity .18s ease;
+}
+
+.mag-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 60px rgba(0, 0, 0, .1);
+}
+
+.mag-card:hover::after {
+    opacity: 1;
+}
+
+.mag-media {
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+}
+
+.mag-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.mag-body {
+    padding: 16px 18px 18px;
+}
+
+.mag-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.mag-pill {
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--text);
+    background: #eef6ff;
+    border: 1px solid #d7eaff;
+    border-radius: 9999px;
+    padding: 6px 10px;
+}
+
+.mag-title {
+    margin: 0 0 6px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.mag-title a {
+    color: inherit;
+}
+
+.mag-excerpt {
+    margin: 0 0 10px;
+    color: #6b7280;
+}
+
+.mag-more a {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+    .mag-media {
+        height: 220px;
+    }
+
+    .mag-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .mag-media {
+        height: 200px;
+    }
+
+    .mag-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Markdown presentation (used in detail pages + preview) --- */
+.md-prose {
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.md-prose h1,
+.md-prose h2,
+.md-prose h3,
+.md-prose h4,
+.md-prose h5,
+.md-prose h6 {
+    font-weight: 600;
+    margin: 1.2em 0 .6em;
+    line-height: 1.25;
+}
+
+.md-prose p {
+    margin: 0 0 1em;
+}
+
+.md-prose ul {
+    padding-left: 1.4em;
+    margin: .6em 0 1em;
+    list-style: disc;
+}
+
+.md-prose ol {
+    padding-left: 1.4em;
+    margin: .6em 0 1em;
+    list-style: decimal;
+}
+
+.md-prose li+li {
+    margin-top: .25em;
+}
+
+.md-prose a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.md-prose a:hover {
+    text-decoration: underline;
+}
+
+.md-prose code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    padding: .1em .35em;
+    border-radius: 6px;
+    background: #f3f4f6;
+}
+
+.md-prose pre {
+    background: #0f172a0a;
+    border: 1px solid #e5e7eb;
+    padding: 12px 14px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: .8em 0 1.1em;
+}
+
+.md-prose blockquote {
+    margin: .8em 0;
+    padding-left: 14px;
+    border-left: 4px solid var(--accent);
+    color: #4b5563;
+}
+
+/* ---- Markdown content ---- */
+.md {
+    line-height: 1.7;
+    color: var(--text);
+}
+
+.md h1,
+.md h2,
+.md h3 {
+    margin: 1.2rem 0 .6rem;
+    font-weight: 600;
+}
+
+.md p {
+    margin: .75rem 0;
+}
+
+.md ul,
+.md ol {
+    padding-left: 1.25rem;
+    margin: .75rem 0;
+}
+
+.md blockquote {
+    margin: .9rem 0;
+    padding: .6rem .9rem;
+    border-left: 3px solid var(--accent);
+    background: #f7fbff;
+    border-radius: 8px;
+}
+
+.md pre {
+    background: #0b1220;
+    color: #eaeefb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    overflow: auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+}
+
+.md code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: .92em;
+}
+
+.md :not(pre)>code {
+    background: #eef2ff;
+    color: #1f2937;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.md table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.md th,
+.md td {
+    border: 1px solid #e5e7eb;
+    padding: .5rem .6rem;
+    text-align: left;
+}
+
+.md a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.md a:hover {
+    text-decoration: underline;
+}
+
+/* ----- Reset demo styles that center everything ----- */
+body {
+    display: block !important;
+    place-items: unset !important;
+    min-height: auto !important;
+}
+
+#root {
+    max-width: none !important;
+    padding: 0 !important;
+    text-align: initial !important;
+}
+
+/* Ensure editors/areas start at the top and feel natural */
+.ui.form textarea {
+    min-height: 140px;
+    line-height: 1.45;
+    padding-top: 10px;
+}
+
+.CodeMirror {
+    display: block !important;
+}
+
+.CodeMirror-scroll {
+    padding: 12px !important;
+    /* comfortable top padding */
 }

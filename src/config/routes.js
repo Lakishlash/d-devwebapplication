@@ -1,11 +1,10 @@
 // src/config/routes.js
 // Centralised route constants (no hardcoding in components)
-
 export const ROUTES = Object.freeze({
     HOME: "/",
     NEW_POST: "/post/new",
 
-    // New top-level sections
+    // Top-level sections
     QUESTIONS: "/questions",
     ARTICLES: "/articles",
     TUTORIALS: "/tutorials",
@@ -19,11 +18,17 @@ export const ROUTES = Object.freeze({
     PROFILE: "/profile",
     PLANS: "/plans",
 
-    // ✅ Added for Stripe checkout (used by Plans CTA)
+    // Payments
     CHECKOUT: "/checkout",
 
-    // Optional static pages used in header (safe to keep even if not yet created)
+    // Info pages
     FAQS: "/faqs",
     HELP: "/help",
     SUPPORT: "/contact",
+
+    // Legal
+    PRIVACY: "/privacy",
+    TERMS: "/terms",
+    CODE_OF_CONDUCT: "/code-of-conduct",
 });
+

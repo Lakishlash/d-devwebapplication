@@ -1,10 +1,14 @@
-// src/pages/TutorialDetailPage.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import {
     Container, Segment, Header, Image, Label, Message,
     Form, Button, Input
 } from "semantic-ui-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeHighlight from "rehype-highlight";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { THEME } from "@/config";
 import { useAuth } from "@/auth/AuthProvider";
@@ -62,8 +66,7 @@ export default function TutorialDetailPage() {
     }, [id, editing]);
 
     // Tags input handlers
-    const addTag = (t) =>
-        setTags((xs) => (xs.length >= 3 ? xs : [...xs, (t || "").trim()].filter(Boolean)));
+    const addTag = (t) => setTags((xs) => (xs.length >= 3 ? xs : [...xs, (t || "").trim()].filter(Boolean)));
     const removeTag = (i) => setTags((xs) => xs.filter((_, idx) => idx !== i));
     const popTag = () => setTags((xs) => xs.slice(0, -1));
 
@@ -75,12 +78,8 @@ export default function TutorialDetailPage() {
             let imageUrl = post?.imageUrl ?? null;
             let videoUrl = post?.videoUrl ?? null;
 
-            if (imageFile && user?.uid) {
-                imageUrl = await uploadTutorialImage(user.uid, imageFile);
-            }
-            if (videoFile && user?.uid) {
-                videoUrl = await uploadTutorialVideo(user.uid, videoFile);
-            }
+            if (imageFile && user?.uid) imageUrl = await uploadTutorialImage(user.uid, imageFile);
+            if (videoFile && user?.uid) videoUrl = await uploadTutorialVideo(user.uid, videoFile);
 
             await updateTutorial(id, {
                 title: (title || "").trim(),
@@ -128,6 +127,7 @@ export default function TutorialDetailPage() {
                                 <Header as="h2" style={{ color: THEME.colors.text, fontFamily: "Poppins, sans-serif" }}>
                                     {post?.title || "Tutorial"}
                                 </Header>
+
                                 <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
                                     <Label image>
                                         <img src={post?.author?.photoURL || "/assets/default-avatar.svg"} alt="" />
@@ -151,10 +151,18 @@ export default function TutorialDetailPage() {
                                     />
                                 )}
 
-                                <p style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{post?.description}</p>
+                                {/* Markdown description */}
+                                <div className="md">
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                        rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
+                                    >
+                                        {post?.description || ""}
+                                    </ReactMarkdown>
+                                </div>
 
                                 {mine && (
-                                    <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                                    <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
                                         <Button size="small" onClick={() => setEditing(true)}>Edit</Button>
                                         <Button size="small" negative onClick={remove}>Delete</Button>
                                     </div>
@@ -178,8 +186,8 @@ export default function TutorialDetailPage() {
                                     </Form.Field>
 
                                     <Form.TextArea
-                                        label="Description"
-                                        rows={6}
+                                        label="Description (Markdown supported)"
+                                        rows={8}
                                         value={description}
                                         onChange={(_, { value }) => setDescription(value)}
                                     />
@@ -219,18 +227,11 @@ export default function TutorialDetailPage() {
                                         />
                                     </Form.Field>
 
-                                    <Button
-                                        primary
-                                        onClick={save}
-                                        loading={busy}
-                                        disabled={!mine}
-                                        style={{ background: THEME.colors.accent, color: "#fff" }}
-                                    >
+                                    <Button primary onClick={save} loading={busy} disabled={!mine}
+                                        style={{ background: THEME.colors.accent, color: "#fff" }}>
                                         Save
                                     </Button>
-                                    <Button basic onClick={() => { setEditing(false); }}>
-                                        Cancel
-                                    </Button>
+                                    <Button basic onClick={() => setEditing(false)}>Cancel</Button>
                                 </Form>
                             </>
                         )}

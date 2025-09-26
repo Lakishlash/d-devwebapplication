@@ -1,5 +1,5 @@
 // src/App.jsx
-// App router: adds /checkout route for Stripe flow (keeps everything else unchanged)
+// App router with Checkout (/checkout), Support (/contact), FAQs, Help, and Legal.
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HeaderBar from "./components/HeaderBar.jsx";
@@ -8,7 +8,17 @@ import SiteFooter from "./components/SiteFooter.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import NewPostPage from "./pages/NewPostPage.jsx";
 import PlansPage from "./pages/PlansPage.jsx";
-import CheckoutPage from "./pages/CheckoutPage.jsx"; // ← added
+import CheckoutPage from "./pages/CheckoutPage.jsx";
+import SupportPage from "./pages/SupportPage.jsx";
+
+// Help / FAQs
+import HelpPage from "./pages/HelpPage.jsx";
+import FaqsPage from "./pages/FaqsPage.jsx";
+
+// Legal
+import PrivacyPage from "./pages/PrivacyPage.jsx";
+import TermsPage from "./pages/TermsPage.jsx";
+import CodeOfConductPage from "./pages/CodeOfConductPage.jsx";
 
 // Section list pages
 import QuestionsPage from "./pages/QuestionsPage.jsx";
@@ -20,7 +30,7 @@ import QuestionDetailPage from "./pages/QuestionDetailPage.jsx";
 import ArticleDetailPage from "./pages/ArticleDetailPage.jsx";
 import TutorialDetailPage from "./pages/TutorialDetailPage.jsx";
 
-// Global search page
+// Global search
 import SearchPage from "./pages/SearchPage.jsx";
 
 import RequireAuth from "./routes/RequireAuth.jsx";
@@ -59,15 +69,20 @@ export default function App() {
         {/* Plans */}
         <Route path="/plans" element={<PlansPage />} />
 
-        {/* ✅ Checkout (protected) */}
-        <Route
-          path="/checkout"
-          element={
-            <RequireAuth>
-              <CheckoutPage />
-            </RequireAuth>
-          }
-        />
+        {/* Checkout */}
+        <Route path="/checkout" element={<CheckoutPage />} />
+
+        {/* Support / Contact */}
+        <Route path="/contact" element={<SupportPage />} />
+
+        {/* FAQs & Help */}
+        <Route path="/faqs" element={<FaqsPage />} />
+        <Route path="/help" element={<HelpPage />} />
+
+        {/* Legal */}
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/code-of-conduct" element={<CodeOfConductPage />} />
 
         {/* Fallback → Home */}
         <Route path="*" element={<HomePage />} />
